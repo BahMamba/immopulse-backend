@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.mamba.immopulse_backend.model.dto.LoginRequest;
-import com.mamba.immopulse_backend.model.dto.LoginResponse;
-import com.mamba.immopulse_backend.model.dto.UserProfileReponse;
+import com.mamba.immopulse_backend.model.dto.auth.LoginRequest;
+import com.mamba.immopulse_backend.model.dto.auth.LoginResponse;
+import com.mamba.immopulse_backend.model.dto.auth.UserProfileReponse;
 import com.mamba.immopulse_backend.service.utils.AuthService;
 
 import lombok.RequiredArgsConstructor;

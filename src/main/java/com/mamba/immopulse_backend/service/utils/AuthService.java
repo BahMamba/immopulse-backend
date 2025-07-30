@@ -8,9 +8,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.stereotype.Service;
 
 import com.mamba.immopulse_backend.config.JwtUtil;
-import com.mamba.immopulse_backend.model.dto.LoginRequest;
-import com.mamba.immopulse_backend.model.dto.LoginResponse;
-import com.mamba.immopulse_backend.model.dto.UserProfileReponse;
+import com.mamba.immopulse_backend.model.dto.auth.LoginRequest;
+import com.mamba.immopulse_backend.model.dto.auth.LoginResponse;
+import com.mamba.immopulse_backend.model.dto.auth.UserProfileReponse;
 import com.mamba.immopulse_backend.model.entity.User;
 import com.mamba.immopulse_backend.repository.UserRepository;
 

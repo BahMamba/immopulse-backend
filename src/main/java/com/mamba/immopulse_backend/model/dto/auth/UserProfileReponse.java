@@ -1,4 +1,4 @@
-package com.mamba.immopulse_backend.model.dto;
+package com.mamba.immopulse_backend.model.dto.auth;
 
 import com.mamba.immopulse_backend.model.enums.RoleUser;
 
