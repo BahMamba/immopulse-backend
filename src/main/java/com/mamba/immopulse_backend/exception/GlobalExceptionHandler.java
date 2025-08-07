@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -13,7 +15,9 @@ import org.springframework.web.bind.annotation.*;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // Identifiants invalides
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class); // 👈 Ajoute un logger
+
+    // ⚠️ Identifiants invalides
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<Map<String, Object>> handleBadCredentials(BadCredentialsException ex) {
         Map<String, Object> body = new HashMap<>();
@@ -23,9 +27,10 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
     }
 
-    // Erreurs métier (Runtime)
+    // ⚠️ Erreurs métier (Exception volontaire dans le service ou controller)
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, Object>> handleRuntime(RuntimeException ex) {
+        logger.warn("Erreur métier : {}", ex.getMessage()); // 👈 Log sur niveau WARN
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("status", HttpStatus.BAD_REQUEST.value());
@@ -33,7 +38,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
-    // Mauvais format des données (DTOs invalides)
+    // ⚠️ Mauvais format DTO (validation échouée)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidation(MethodArgumentNotValidException ex) {
         Map<String, Object> body = new HashMap<>();
@@ -43,9 +48,11 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
-    // Erreurs non prévues
+    // ❗️ Erreurs techniques inattendues (null, file, etc.)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGlobal(Exception ex) {
+        logger.error("Erreur interne non prévue :", ex); // 👈 Ceci logge la stack trace en console
+
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());

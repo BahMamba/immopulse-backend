@@ -1,21 +1,26 @@
 package com.mamba.immopulse_backend.service;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.mamba.immopulse_backend.model.dto.properties.PropertyDetailResponse;
 import com.mamba.immopulse_backend.model.dto.properties.PropertyListResponse;
 import com.mamba.immopulse_backend.model.dto.properties.PropertyRequest;
 import com.mamba.immopulse_backend.model.dto.properties.PropertyResponse;
 import com.mamba.immopulse_backend.model.entity.Property;
+import com.mamba.immopulse_backend.model.entity.PropertyImage;
 import com.mamba.immopulse_backend.model.entity.User;
+import com.mamba.immopulse_backend.repository.PropertyImageRepository;
 import com.mamba.immopulse_backend.repository.PropertyRepository;
 import com.mamba.immopulse_backend.repository.UserRepository;
+import com.mamba.immopulse_backend.service.utils.StorageService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,7 +29,33 @@ import lombok.RequiredArgsConstructor;
 public class PropertyService {
 
     private final PropertyRepository propertyRepository;
+    private final PropertyImageRepository propertyImageRepository;
     private final UserRepository userRepository;
+    private final StorageService storageService;
+
+
+    // Ajouter ou mettre à jour une image de couverture
+    public String addCoverImage(Long propertyId, MultipartFile file) {
+        User user = getAuthenticated();
+        Property property = propertyRepository.findById(propertyId)
+            .orElseThrow(() -> new RuntimeException("Propriété non trouvée"));
+
+        if (!property.getOwner().getId().equals(user.getId())) {
+            throw new RuntimeException("Vous ne pouvez modifier que vos propres propriétés");
+        }
+
+        // Supprime ancienne image si elle existe
+        if (property.getCoverImageUrl() != null) {
+            storageService.delete(property.getCoverImageUrl());
+        }
+
+        String imageUrl = storageService.save(file);
+        property.setCoverImageUrl(imageUrl);
+        propertyRepository.save(property);
+
+        return imageUrl;
+    }
+
 
     // Récupère l'utilisateur actuellement authentifié
     private User getAuthenticated(){
@@ -140,9 +171,54 @@ public class PropertyService {
     }
 
     // Détail d'une propriété
-    public PropertyListResponse getPropertyById(Long id) {
+    public PropertyDetailResponse getPropertyDetail(Long id){
         Property property = propertyRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Propriété Introuvable!"));
-        return mapResponseList(property);
+            .orElseThrow(() -> new RuntimeException("Propriété introuvable!"));
+        
+        List<String> images = propertyImageRepository.findByProperty(property)
+            .stream()
+            .map(PropertyImage::getImageUrl)
+            .toList();
+        
+        return new PropertyDetailResponse(
+            property.getId(),
+            property.getTitle(),
+            property.getDescription(),
+            property.getAddress(),
+            property.getPrice().doubleValue(),
+            property.getType().name(),
+            property.getStatus().name(),
+            property.getCoverImageUrl(),
+            property.getOwner().getFullname(),
+            property.getOwner().getEmail(),
+            images
+        );
+    }
+
+    // Methode pour ajouter des images sur une property
+    public List<String> addImages(Long id, List<MultipartFile> files){
+        User user = getAuthenticated();
+        Property property = propertyRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Propriete introuvable"));
+        
+        if (!property.getOwner().getEmail().equals(user.getEmail())) {
+            throw new RuntimeException("Vous ne pouvez modifier que vos propres propriétés");
+        }
+
+        List<String> imageUrls = new ArrayList<>();
+
+        for (MultipartFile file : files) {
+            String imageUrl = storageService.save(file);
+
+            PropertyImage image = PropertyImage.builder()
+                .imageUrl(imageUrl)
+                .property(property)
+                .build();
+            
+            propertyImageRepository.save(image);
+            imageUrls.add(imageUrl);
+            
+        }
+        return imageUrls;
     }
 }
