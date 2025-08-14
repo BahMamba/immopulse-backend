@@ -50,11 +50,12 @@ public class PropertyController {
     // Lister toutes les propriétés avec pagination et filtres
     @GetMapping
     public ResponseEntity<Page<PropertyListResponse>> getAllProperties(
-        @RequestParam(required = false) String title,
-        @RequestParam(required = false) String address,
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false, defaultValue = "id") String sortBy,
         Pageable pageable
     ) {
-        return ResponseEntity.ok(propertyService.getAllProperties(title, address, pageable));
+        return ResponseEntity.ok(propertyService.getAllProperties(title, status, sortBy, pageable));
     }
 
     // Lister les propriétés du propriétaire connecté (avec pagination)

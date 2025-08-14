@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,7 @@ import com.mamba.immopulse_backend.model.dto.properties.PropertyResponse;
 import com.mamba.immopulse_backend.model.entity.Property;
 import com.mamba.immopulse_backend.model.entity.PropertyImage;
 import com.mamba.immopulse_backend.model.entity.User;
+import com.mamba.immopulse_backend.model.enums.PropertyStatus;
 import com.mamba.immopulse_backend.repository.PropertyImageRepository;
 import com.mamba.immopulse_backend.repository.PropertyRepository;
 import com.mamba.immopulse_backend.repository.UserRepository;
@@ -149,19 +152,29 @@ public class PropertyService {
     }
 
     // Lister toutes les propriétés (avec pagination + filtre simple)
-    public Page<PropertyListResponse> getAllProperties(String title, String address, Pageable pageable) {
-        Page<Property> page;
+    public Page<PropertyListResponse> getAllProperties(String title, String status, String sortBy, Pageable pageable) {
+    Pageable sortedPageable = PageRequest.of(
+        pageable.getPageNumber(),
+        pageable.getPageSize(),
+        Sort.by(Sort.Direction.ASC, sortBy != null ? sortBy : "id")
+    );
 
-        if (title != null && !title.isBlank()) {
-            page = propertyRepository.findByTitleContainingIgnoreCase(title, pageable);
-        } else if (address != null && !address.isBlank()) {
-            page = propertyRepository.findByAddressContainingIgnoreCase(address, pageable);
-        } else {
-            page = propertyRepository.findAll(pageable);
+    Page<Property> page;
+    if (title != null && !title.isBlank()) {
+        page = propertyRepository.findByTitleContainingIgnoreCase(title, sortedPageable);
+    } else if (status != null && !status.isBlank()) {
+        try {
+            PropertyStatus statusEnum = PropertyStatus.valueOf(status.toUpperCase());
+            page = propertyRepository.findByStatus(statusEnum, sortedPageable);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Statut invalide : " + status);
         }
-
-        return page.map(this::mapResponseList);
+    } else {
+        page = propertyRepository.findAll(sortedPageable);
     }
+
+    return page.map(this::mapResponseList);
+}
 
     // Lister les propriétés du propriétaire connecté (avec pagination)
     public Page<PropertyListResponse> getPropertiesByOwner(Pageable pageable){
