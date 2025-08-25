@@ -16,7 +16,7 @@ import com.mamba.immopulse_backend.model.dto.properties.PropertyResponse;
 import com.mamba.immopulse_backend.model.entity.Property;
 import com.mamba.immopulse_backend.model.entity.PropertyImage;
 import com.mamba.immopulse_backend.model.entity.User;
-import com.mamba.immopulse_backend.model.enums.PropertyStatus;
+import com.mamba.immopulse_backend.model.enums.property.PropertyStatus;
 import com.mamba.immopulse_backend.repository.PropertyImageRepository;
 import com.mamba.immopulse_backend.repository.PropertyRepository;
 import com.mamba.immopulse_backend.repository.UserRepository;

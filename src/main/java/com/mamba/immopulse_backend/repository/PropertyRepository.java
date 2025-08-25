@@ -2,7 +2,8 @@ package com.mamba.immopulse_backend.repository;
 
 import com.mamba.immopulse_backend.model.entity.Property;
 import com.mamba.immopulse_backend.model.entity.User;
-import com.mamba.immopulse_backend.model.enums.PropertyStatus;
+import com.mamba.immopulse_backend.model.enums.property.PropertyStatus;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

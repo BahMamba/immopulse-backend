@@ -2,8 +2,8 @@ package com.mamba.immopulse_backend.model.dto.properties;
 
 import java.math.BigDecimal;
 
-import com.mamba.immopulse_backend.model.enums.PropertyStatus;
-import com.mamba.immopulse_backend.model.enums.PropertyType;
+import com.mamba.immopulse_backend.model.enums.property.PropertyStatus;
+import com.mamba.immopulse_backend.model.enums.property.PropertyType;
 
 public record PropertyRequest(
     String title,

@@ -3,8 +3,8 @@ package com.mamba.immopulse_backend.model.entity;
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.mamba.immopulse_backend.model.enums.PropertyStatus;
-import com.mamba.immopulse_backend.model.enums.PropertyType;
+import com.mamba.immopulse_backend.model.enums.property.PropertyStatus;
+import com.mamba.immopulse_backend.model.enums.property.PropertyType;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;

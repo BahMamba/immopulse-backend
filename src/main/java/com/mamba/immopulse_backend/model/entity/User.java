@@ -1,6 +1,6 @@
 package com.mamba.immopulse_backend.model.entity;
 
-import com.mamba.immopulse_backend.model.enums.RoleUser;
+import com.mamba.immopulse_backend.model.enums.users.RoleUser;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -35,7 +35,5 @@ public class User {
     private RoleUser roleUser;
 
     private boolean is_active = true;
-
-
 
 }
