@@ -36,4 +36,6 @@ public class User {
 
     private boolean is_active = true;
 
+    @Column(nullable = false)
+    private String phoneNumber;
 }
