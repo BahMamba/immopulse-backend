@@ -32,8 +32,6 @@ public class TenantService {
     private final PropertyRepository propertyRepository;
     private final PasswordEncoder passwordEncoder;
 
-    // =============== METHODES UTILITAIRES =============== //
-
     private User getUserAuthenticated() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
@@ -69,10 +67,8 @@ public class TenantService {
         );
     }
 
-    // =============== METHODES CRUDS =============== //
-
     @Transactional
-    public TenantResponse createTenant(UserRequest request) {
+    public TenantResponse createTenant(UserRequest request, String password) {
         if (userRepository.findByEmail(request.email()).isPresent()) {
             logger.warn("Tentative de création avec email existant : {}", request.email());
             throw new RuntimeException("Email déjà utilisé");
@@ -82,7 +78,7 @@ public class TenantService {
         user.setFullname(request.fullname());
         user.setEmail(request.email());
         user.setPhoneNumber(request.phoneNumber());
-        user.setPassword(passwordEncoder.encode(request.password()));
+        user.setPassword(passwordEncoder.encode(password));
         user.setRoleUser(RoleUser.TENANT);
         user = userRepository.save(user);
 
@@ -115,9 +111,6 @@ public class TenantService {
         user.setFullname(request.fullname());
         user.setEmail(request.email());
         user.setPhoneNumber(request.phoneNumber());
-        if (request.password() != null && !request.password().isBlank()) {
-            user.setPassword(passwordEncoder.encode(request.password()));
-        }
         User updatedUser = userRepository.save(user);
         logger.info("Profil tenant mis à jour : {}", updatedUser.getEmail());
         return mapUserResponse(updatedUser);
