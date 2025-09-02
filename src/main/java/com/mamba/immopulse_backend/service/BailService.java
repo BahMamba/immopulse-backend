@@ -13,6 +13,10 @@ import com.mamba.immopulse_backend.repository.BailRepository;
 import com.mamba.immopulse_backend.repository.PropertyRepository;
 import com.mamba.immopulse_backend.repository.TenantRepository;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -169,5 +173,23 @@ public class BailService {
         bailRepository.save(bail);
 
         return mapBailResponse(bail);
+    }
+
+    // Liste l’historique des baux d’un locataire avec pagination
+    public Page<BailResponse> getBailHistoryByTenant(Long tenantId, int page, int size) {
+        tenantRepository.findById(tenantId)
+            .orElseThrow(() -> new RuntimeException("Locataire Introuvable"));
+        Pageable pageable = PageRequest.of(page, size);
+        return bailRepository.findByTenantId(tenantId, pageable)
+            .map(this::mapBailResponse);
+    }
+
+    // Liste l’historique des baux d’une propriété avec pagination
+    public Page<BailResponse> getBailsByProperty(Long propertyId, int page, int size) {
+        propertyRepository.findById(propertyId)
+            .orElseThrow(() -> new RuntimeException("Propriété Introuvable"));
+        Pageable pageable = PageRequest.of(page, size);
+        return bailRepository.findByPropertyId(propertyId, pageable)
+            .map(this::mapBailResponse);
     }
 }

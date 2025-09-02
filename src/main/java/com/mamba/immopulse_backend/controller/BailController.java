@@ -7,6 +7,7 @@ import com.mamba.immopulse_backend.service.BailService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -49,5 +50,27 @@ public class BailController {
             @Valid @RequestBody BailRenewRequest request) {
         BailResponse response = bailService.renewBail(bailId, request);
         return ResponseEntity.ok(response);
+    }
+
+    // Liste l’historique des baux d’une propriété avec pagination
+    @GetMapping("/property/{propertyId}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('OWNER')")
+    public ResponseEntity<Page<BailResponse>> getBailHistory(
+        @PathVariable Long propertyId,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size
+        ){
+            return ResponseEntity.ok(bailService.getBailsByProperty(propertyId, page, size));
+    }
+
+    // Liste l’historique des baux d’un locataire avec pagination
+    @GetMapping("/tenant/{tenantId}/history")
+    @PreAuthorize("hasRole('TENANT') or hasRole('ADMIN') or hasRole('OWNER')")
+    public ResponseEntity<Page<BailResponse>> getBailHistoryByTenant(
+        @PathVariable Long tenantId,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size) {
+            
+        return ResponseEntity.ok(bailService.getBailHistoryByTenant(tenantId, page, size));
     }
 }
