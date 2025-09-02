@@ -1,9 +1,8 @@
 package com.mamba.immopulse_backend.model.entity;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
-import com.mamba.immopulse_backend.model.enums.payment.PaymentStatus;
+import com.mamba.immopulse_backend.model.enums.bail.BailStatus;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -14,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,26 +22,43 @@ import lombok.NoArgsConstructor;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @Data
-@Table(name = "payments")
-public class Payment {
+@Builder
+@Table(name = "bails")
+public class Bail {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
     @JoinColumn(name = "tenant_id", nullable = false)
+    @NotNull
     private Tenant tenant;
 
-    private BigDecimal amount;
-    private LocalDate paymentDate;
+    @ManyToOne
+    @JoinColumn(name = "property_id", nullable = false)
+    @NotNull
+    private Property property;
+
+    @NotNull
+    private String startDate;
+
+    @NotNull
+    private String endDate;
+
+    @NotNull
+
+    @NotNull
+    private BigDecimal rentAmount;
+
+    private BigDecimal agencyFee;
+
+    @NotNull
+    private BigDecimal depositAmount;
+
+    private String contractUrl;
 
     @Enumerated(EnumType.STRING)
-    private PaymentStatus status;
-
-    private String transactionId;
-    private String currency;
-    private LocalDate dueDate;
-
+    @NotNull
+    private BailStatus status;
 }

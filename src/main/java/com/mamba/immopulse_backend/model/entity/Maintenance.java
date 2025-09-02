@@ -2,8 +2,8 @@ package com.mamba.immopulse_backend.model.entity;
 
 import java.time.LocalDateTime;
 
-import com.mamba.immopulse_backend.model.enums.maintenances.Status;
-import com.mamba.immopulse_backend.model.enums.maintenances.Urgency;
+import com.mamba.immopulse_backend.model.enums.maintenance.Status;
+import com.mamba.immopulse_backend.model.enums.maintenance.Urgency;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
