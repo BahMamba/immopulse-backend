@@ -176,7 +176,7 @@ public class BailService {
     }
 
     // Liste l’historique des baux d’un locataire avec pagination
-    public Page<BailResponse> getBailHistoryByTenant(Long tenantId, int page, int size) {
+    public Page<BailResponse> getBailByTenant(Long tenantId, int page, int size) {
         tenantRepository.findById(tenantId)
             .orElseThrow(() -> new RuntimeException("Locataire Introuvable"));
         Pageable pageable = PageRequest.of(page, size);
