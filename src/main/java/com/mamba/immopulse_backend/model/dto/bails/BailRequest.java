@@ -13,6 +13,5 @@ public record BailRequest(
     @NotBlank String endDate,
     @NotNull @PositiveOrZero BigDecimal depositAmount,
     @PositiveOrZero BigDecimal rentAmount,
-    @PositiveOrZero BigDecimal agencyFee,
-    String contractUrl
+    @PositiveOrZero BigDecimal agencyFee
 ) {}

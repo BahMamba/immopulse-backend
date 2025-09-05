@@ -1,5 +1,6 @@
 package com.mamba.immopulse_backend.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -15,5 +16,6 @@ public interface BailRepository extends JpaRepository<Bail, Long> {
     Optional<Bail> findByTenantIdAndStatus(Long tenantId, BailStatus status);
     Optional<Bail> findByPropertyIdAndStatus(Long propertyId, BailStatus status);
     Page<Bail> findByTenantId(Long tenantId, Pageable pageable);
-    Page<Bail> findByPropertyId(Long propertyId, Pageable pageable);   
+    Page<Bail> findByPropertyId(Long propertyId, Pageable pageable);  
+    List<Bail> findByStatusAndEndDateBefore(BailStatus status, String endDate); 
 }

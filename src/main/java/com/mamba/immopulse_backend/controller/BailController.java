@@ -6,7 +6,6 @@ import com.mamba.immopulse_backend.model.dto.bails.BailResponse;
 import com.mamba.immopulse_backend.service.BailService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,32 +18,41 @@ import org.springframework.web.bind.annotation.*;
 public class BailController {
     private final BailService bailService;
 
-    // Crée un nouveau bail
+    // Crée un nouveau bail actif
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('OWNER')")
+    @PreAuthorize("hasRole('TENANT')")
     public ResponseEntity<BailResponse> createBail(@Valid @RequestBody BailRequest request) {
         BailResponse response = bailService.createBail(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // Annule un bail existant
-    @DeleteMapping("/{bailId}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('OWNER')")
+    // Annule un bail actif
+    @PostMapping("/{bailId}/cancel")
+    @PreAuthorize("hasRole('TENANT') or hasRole('OWNER') or hasRole('ADMIN')")
     public ResponseEntity<BailResponse> cancelBail(@PathVariable Long bailId) {
         BailResponse response = bailService.cancelBail(bailId);
-        return ResponseEntity.ok(response); 
+        return ResponseEntity.ok(response);
     }
 
-    // Récupère le bail actif d’un locataire
-    @GetMapping("/tenant/{tenantId}")
-    @PreAuthorize("hasRole('TENANT') or hasRole('ADMIN') or hasRole('OWNER')")
-    public ResponseEntity<BailResponse> getBailByTenantId(@PathVariable Long tenantId) {
-        return ResponseEntity.ok(bailService.getBailByTenant(tenantId));
+    // Suspend un bail actif
+    @PostMapping("/{bailId}/suspend")
+    @PreAuthorize("hasRole('OWNER') or hasRole('ADMIN')")
+    public ResponseEntity<BailResponse> suspendBail(@PathVariable Long bailId) {
+        BailResponse response = bailService.suspendBail(bailId);
+        return ResponseEntity.ok(response);
     }
 
-    // Renouvellement d'un Bail ACTIF
-    @PatchMapping("/{bailId}/renew")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('OWNER')")
+    // Reprend un bail suspendu
+    @PostMapping("/{bailId}/resume")
+    @PreAuthorize("hasRole('TENANT') or hasRole('OWNER') or hasRole('ADMIN')")
+    public ResponseEntity<BailResponse> resumeBail(@PathVariable Long bailId) {
+        BailResponse response = bailService.resumeBail(bailId);
+        return ResponseEntity.ok(response);
+    }
+
+    // Renouvelle un bail actif
+    @PostMapping("/{bailId}/renew")
+    @PreAuthorize("hasRole('TENANT') or hasRole('OWNER') or hasRole('ADMIN')")
     public ResponseEntity<BailResponse> renewBail(
             @PathVariable Long bailId,
             @Valid @RequestBody BailRenewRequest request) {
@@ -52,25 +60,30 @@ public class BailController {
         return ResponseEntity.ok(response);
     }
 
-    // Liste l’historique des baux d’une propriété avec pagination
-    @GetMapping("/property/{propertyId}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('OWNER')")
-    public ResponseEntity<Page<BailResponse>> getBailHistory(
-        @PathVariable Long propertyId,
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int size
-        ){
-            return ResponseEntity.ok(bailService.getBailsByProperty(propertyId, page, size));
+    // Récupère le bail actif d’un locataire
+    @GetMapping("/tenant/{tenantId}")
+    @PreAuthorize("hasRole('TENANT') or hasRole('OWNER') or hasRole('ADMIN')")
+    public ResponseEntity<BailResponse> getBailByTenantId(@PathVariable Long tenantId) {
+        return ResponseEntity.ok(bailService.getBailByTenant(tenantId));
     }
 
     // Liste l’historique des baux d’un locataire avec pagination
     @GetMapping("/tenant/{tenantId}/history")
-    @PreAuthorize("hasRole('TENANT') or hasRole('ADMIN') or hasRole('OWNER')")
+    @PreAuthorize("hasRole('TENANT') or hasRole('OWNER') or hasRole('ADMIN')")
     public ResponseEntity<Page<BailResponse>> getBailHistoryByTenant(
-        @PathVariable Long tenantId,
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int size) {
-            
+            @PathVariable Long tenantId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(bailService.getBailByTenant(tenantId, page, size));
+    }
+
+    // Liste l’historique des baux d’une propriété avec pagination
+    @GetMapping("/property/{propertyId}")
+    @PreAuthorize("hasRole('TENANT') or hasRole('OWNER') or hasRole('ADMIN')")
+    public ResponseEntity<Page<BailResponse>> getBailHistory(
+            @PathVariable Long propertyId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(bailService.getBailsByProperty(propertyId, page, size));
     }
 }
